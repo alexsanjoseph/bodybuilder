@@ -3,7 +3,7 @@ Main Builder Class and functions
 """
 
 
-class BodyBuilder:
+class bodyBuilder:
 
     """
     Builder Class which creates the queries
