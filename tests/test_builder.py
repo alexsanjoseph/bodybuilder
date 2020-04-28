@@ -2,13 +2,15 @@
 This file holds all the main tests
 """
 
-# from bodybuilder import builder
+from bodybuilder.builder import BodyBuilder as BB
 
 
-def test_true():
-    """
-    Test function
+def test_query_no_field():
 
-    """
+    result = BB().query('match_all')
 
-    assert True
+    expected_query = {
+        'match_all': {}
+    }
+
+    assert result.get_query() == expected_query
