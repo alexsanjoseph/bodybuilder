@@ -3,6 +3,7 @@ Main Builder Class and functions
 """
 from collections import OrderedDict
 
+
 class BodyBuilder:
 
     """
@@ -40,8 +41,7 @@ class BodyBuilder:
 
     @staticmethod
     def create_sort_query(sort_dict):
-        sort_body = [{key: {'order': value}}for key, value in sort_dict.items()]
-        return sort_body
+        return [{key: {'order': value}}for key, value in sort_dict.items()]
 
     def _add_queries_simple(self):
         self.body['query'] = self.create_generic_query(*self.queries[0])
@@ -86,11 +86,12 @@ class BodyBuilder:
         return True
 
     def query_exists(self):
-        if (len(self.queries)
+        if (
+            len(self.queries)
             + len(self.filters)
             + len(self.orFilters)
             + len(self.notFilters)
-            ) > 0:
+                ) > 0:
             return True
         return False
 
