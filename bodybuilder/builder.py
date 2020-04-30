@@ -23,7 +23,7 @@ class BodyBuilder:
             simple_query[0]: {}
         }
         if simple_query[1] is not None:
-            query_dict[simple_query] = {
+            query_dict[simple_query[0]] = {
                 simple_query[2]: simple_query[1]
             }
         self.body['query'] = query_dict
@@ -41,7 +41,7 @@ class BodyBuilder:
         pass
 
     def query(self, query_type, query_val=None, query_field='field'):
-        self.queries.add((query_type, query_val, query_field))
+        self.queries.append((query_type, query_val, query_field))
         return self
 
     def filter(self, type, field, value):
@@ -65,4 +65,4 @@ class BodyBuilder:
         return self.body
 
     def get_query(self):
-        return self.body['query']
+        return self.build()['query']
