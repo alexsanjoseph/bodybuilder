@@ -31,14 +31,23 @@ class BodyBuilder:
         query_dict = {
             args[0]: {}
         }
-        if len(args) > 1:
-            query_field = 'field' if len(args) == 2 else args[1]
-            query_val = args[-1]
-            query_dict[args[0]] = {
-                query_field: query_val
-            }
-        if len(args) > 3:
-            raise ValueError
+        if len(args) == 1:
+            return query_dict
+
+        if len(args) == 2:
+            query_field, query_val = 'field', args[1]
+        else:
+            query_field, query_val = args[1], args[2]
+
+        query_dict[args[0]] = {
+            query_field: query_val
+        }
+        if len(args) == 4:
+            for key, value in args[3].items():
+                query_dict[args[0]][key] = value
+        if len(args) > 4:
+            raise IndexError("Too many arguments to query!")
+
         return query_dict
 
     @staticmethod
@@ -140,6 +149,9 @@ class BodyBuilder:
         self.rawOptions[key] = value
         return self
 
+    def getFilter(self):
+        return self.build()['query']['bool']['filter']
+
     def build(self):
         if self.query_exists():
             if self.is_simple_query():
@@ -155,7 +167,3 @@ class BodyBuilder:
         self._add_misc()
         return self.body
 
-
-
-    def getFilter(self):
-        return self.build()['query']['bool']['filter']

@@ -5,7 +5,7 @@ This file holds all the main tests
 from bodybuilder.builder import BodyBuilder as bodyBuilder
 
 
-class TestBodyBuilder():
+class TestBodyBuilder:
 
     def test__query_no_field(self):
         result = bodyBuilder().query('match_all')
@@ -159,3 +159,45 @@ class TestBodyBuilder():
         }
 
         assert result == expected_query
+
+    def test__query_key_value(self):
+        result = bodyBuilder().query('term', 'user', 'kimchy')
+
+        expected_query = {
+            'term': {
+                'user': 'kimchy'
+            }
+        }
+
+        assert result.getQuery() == expected_query
+
+    def test__query_field_object(self):
+        result = bodyBuilder() \
+            .query('range', 'date', {'gt': 'now-1d'})
+
+        expected_query = {
+            'range': {
+                'date': {'gt': 'now-1d'}
+            }
+        }
+
+        assert result.getQuery() == expected_query
+
+    def test__query_with_more_options(self):
+        result = bodyBuilder() \
+            .query('geo_distance',
+                   'point',
+                   {'lat': 40, 'lon': 20},
+                   {'distance': '12km'}
+                   )
+        expected_query = {
+            'geo_distance': {
+                'point': {
+                    'lat': 40,
+                    'lon': 20
+                },
+                'distance': '12km'
+            }
+        }
+
+        assert result.getQuery() == expected_query
