@@ -125,10 +125,37 @@ class TestBodyBuilder():
         }
         assert result == expected_query
 
-    # def test__from(self):
-    #     result = bodyBuilder.getFrom(10).build()
-    #     expected_query = {
-    #         "from": 10
-    #     }
-    #
-    #     assert result == expected_query
+    def test__from(self):
+        result = bodyBuilder() \
+            .from_(10) \
+            .build()
+
+        expected_query = {
+            "from": 10
+        }
+
+        assert result == expected_query
+
+    def test__size(self):
+        result = bodyBuilder() \
+            .size(10) \
+            .build()
+
+        expected_query = {
+            "size": 10
+        }
+
+        assert result == expected_query
+
+    def test__rawOption(self):
+        result = bodyBuilder() \
+            .rawOption('a', {'b': 'c'}) \
+            .build()
+
+        expected_query = {
+            'a': {
+                'b': 'c'
+            }
+        }
+
+        assert result == expected_query

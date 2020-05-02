@@ -17,7 +17,9 @@ class BodyBuilder:
         self.notFilters = []
         self.aggs = []
         self.sorts = OrderedDict()
+        self.misc = {}
         self.body = {}
+        self.rawOptions = {}
 
     def _add_bool_struct(self):
         self.body['query'] = {
@@ -70,11 +72,21 @@ class BodyBuilder:
     def _add_not_filters(self):
         pass
 
-    def _add_sort(self):
+    def _add_sorts(self):
         if len(self.sorts) == 0:
             return
         sort_dict_list = self.create_sort_query(self.sorts)
         self.body['sort'] = sort_dict_list
+
+    def _add_rawOptions(self):
+        for key, value in self.rawOptions.items():
+            self.body[key] = value
+
+    def _add_misc(self):
+        if self.misc.get('from'):
+            self.body['from'] = self.misc.get('from')
+        if self.misc.get('size'):
+            self.body['size'] = self.misc.get('size')
 
     ######################
 
@@ -103,19 +115,6 @@ class BodyBuilder:
         self.filters.append(args)
         return self
 
-    def build(self):
-        if self.query_exists():
-            if self.is_simple_query():
-                self._add_queries_simple()
-            else:
-                self._add_bool_struct()
-                self._add_queries()
-                self._add_filters()
-                self._add_or_filters()
-                self._add_not_filters()
-        self._add_sort()
-        return self.body
-
     def sort(self, *args):
         if len(args) > 2:
             raise ValueError
@@ -129,8 +128,34 @@ class BodyBuilder:
         else:
             return self.build()['query']['bool']['must']
 
-    def getFrom(self):
-        pass
+    def from_(self, value):
+        self.misc['from'] = value
+        return self
+
+    def size(self, value):
+        self.misc['size'] = value
+        return self
+
+    def rawOption(self, key, value):
+        self.rawOptions[key] = value
+        return self
+
+    def build(self):
+        if self.query_exists():
+            if self.is_simple_query():
+                self._add_queries_simple()
+            else:
+                self._add_bool_struct()
+                self._add_queries()
+                self._add_filters()
+                self._add_or_filters()
+                self._add_not_filters()
+        self._add_sorts()
+        self._add_rawOptions()
+        self._add_misc()
+        return self.body
+
+
 
     def getFilter(self):
         return self.build()['query']['bool']['filter']
