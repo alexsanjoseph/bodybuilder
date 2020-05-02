@@ -1,12 +1,11 @@
 """
 This file holds all the main tests
 """
-from unittest import TestCase
 
 from bodybuilder.builder import BodyBuilder as bodyBuilder
 
 
-class TestBodyBuilder(TestCase):
+class TestBodyBuilder():
 
     def test__query_no_field(self):
         result = bodyBuilder().query('match_all')
@@ -125,3 +124,11 @@ class TestBodyBuilder(TestCase):
             ]
         }
         assert result == expected_query
+
+    # def test__from(self):
+    #     result = bodyBuilder.getFrom(10).build()
+    #     expected_query = {
+    #         "from": 10
+    #     }
+    #
+    #     assert result == expected_query

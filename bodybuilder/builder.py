@@ -129,5 +129,8 @@ class BodyBuilder:
         else:
             return self.build()['query']['bool']['must']
 
+    def getFrom(self):
+        pass
+
     def getFilter(self):
         return self.build()['query']['bool']['filter']
