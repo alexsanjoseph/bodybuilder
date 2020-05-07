@@ -202,14 +202,37 @@ class TestBodyBuilder:
 
         assert result.getQuery() == expected_query
 
-    def test__combined_query_filter(self):
+    def test__nested_aggregations(self):
         result = bodyBuilder() \
-            .query('match', 'message', 'this is a test') \
-            .filter('term', 'user', 'kimchy') \
-            .filter('term', 'user', 'herald') \
-            .orFilter('term', 'user', 'johnny') \
-            .notFilter('term', 'user', 'cassie') \
-            .aggregation('terms', 'user') \
+            .aggregation("a", "b", {
+            "c": "d"
+        }, "e",
+                         lambda x: x.aggregation("f", "g",
+                                                 lambda y: y.aggregation("h", "i", "j"))) \
             .build()
-        expected_query = {}
+        expected_query = {
+            "aggs": {
+                "e": {
+                    "a": {
+                        "field": "b",
+                        "c": "d"
+                    },
+                    "aggs": {
+                        "agg_f_g": {
+                            "f": {
+                                "field": "g"
+                            },
+                            "aggs": {
+                                "j": {
+                                    "h": {
+                                        "field": "i"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         assert result == expected_query
