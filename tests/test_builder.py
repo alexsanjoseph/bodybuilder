@@ -204,11 +204,11 @@ class TestBodyBuilder:
 
     def test__nested_aggregations(self):
         result = bodyBuilder() \
-            .aggregation("a", "b", {
-            "c": "d"
-        }, "e",
-                         lambda x: x.aggregation("f", "g",
-                                                 lambda y: y.aggregation("h", "i", "j"))) \
+            .aggregation(
+                "a", "b", {"c": "d"}, "e",
+                lambda x: x.aggregation(
+                    "f", "g",
+                    lambda y: y.aggregation("h", "i", "j"))) \
             .build()
         expected_query = {
             "aggs": {

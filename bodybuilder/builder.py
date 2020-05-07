@@ -66,8 +66,7 @@ class BodyBuilder:
 
         query_field_dict = {
             'field': args_list[1]
-        } \
-            if type(args_list[1]) is str else {}
+        } if type(args_list[1]) is str else {}
 
         additional_options = [x for x in args_list if type(x) is dict]
         all_options = {key: value for d in (additional_options + [query_field_dict])
