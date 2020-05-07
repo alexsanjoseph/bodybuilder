@@ -124,18 +124,16 @@ class BodyBuilder:
         self.filters.append(args)
         return self
 
+    def aggregation(self, *args):
+        self.aggs.append(args)
+        return self
+
     def sort(self, *args):
         if len(args) > 2:
             raise ValueError
         sort_type = 'asc' if len(args) == 1 else args[1]
         self.sorts[args[0]] = sort_type
         return self
-
-    def getQuery(self):
-        if self.is_simple_query():
-            return self.build()['query']
-        else:
-            return self.build()['query']['bool']['must']
 
     def from_(self, value):
         self.misc['from'] = value
@@ -144,6 +142,12 @@ class BodyBuilder:
     def size(self, value):
         self.misc['size'] = value
         return self
+
+    def getQuery(self):
+        if self.is_simple_query():
+            return self.build()['query']
+        else:
+            return self.build()['query']['bool']['must']
 
     def rawOption(self, key, value):
         self.rawOptions[key] = value
