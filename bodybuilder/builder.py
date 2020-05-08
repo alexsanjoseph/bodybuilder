@@ -69,7 +69,8 @@ class BodyBuilder:
         } if type(args_list[1]) is str else {}
 
         additional_options = [x for x in args_list if type(x) is dict]
-        all_options = {key: value for d in (additional_options + [query_field_dict])
+        all_options = {key: value
+                       for d in (additional_options + [query_field_dict])
                        for key, value in d.items()}
 
         query_name_candidates = [x for x in args_list[2:] if type(x) is str]
@@ -78,8 +79,9 @@ class BodyBuilder:
             query_name = query_name_candidates[0]
         else:
             if len(query_field_dict) == 0:
-                raise ValueError("Query name should be provided if query field is empty")
-            query_name = f"agg_{query_type}_{list(query_field_dict.values())[0]}"
+                raise ValueError("Query name should be provided \
+                                  if query field is empty")
+            query_name = f"agg_{query_type}_{list(query_field_dict.values())[0]}" # noqa E501
 
         query_dict = {
             query_name: {
@@ -87,7 +89,7 @@ class BodyBuilder:
             }
         }
         if nested_function is not None:
-            nested_aggs_query = nested_function(BodyBuilder()).getAggregations()
+            nested_aggs_query = nested_function(BodyBuilder()).getAggregations()  # noqa E501
             query_dict[query_name]['aggs'] = nested_aggs_query
 
         return query_dict
@@ -233,4 +235,3 @@ class BodyBuilder:
         self._add_misc()
         self._add_aggs()
         return self.body
-
