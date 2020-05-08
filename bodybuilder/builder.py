@@ -53,7 +53,7 @@ class BodyBuilder:
     @staticmethod
     def create_aggs_query(*args):
 
-        if len(args) < 1:
+        if len(args) <= 1:
             raise IndexError("Too Few arguments for aggregation query")
         args_list = list(args)
 

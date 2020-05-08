@@ -1,8 +1,9 @@
 # bodybuilder
-A Python Port of the Amazing Bodybuilder Package on NPM
+An (almost!) drop in replacement of the Amazing Bodybuilder Package on NPM
 
 # Variations
-- from -> getFrom because from is a python keyword
+- `from` -> `from_` because `from` is a python keyword
+- individual Filter/Query/Aggregations classes not implemented (user shouldn't need it)
 
 # Not Implemented
 - Complicated multi sort

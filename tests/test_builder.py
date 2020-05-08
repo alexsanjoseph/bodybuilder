@@ -1,6 +1,7 @@
 """
 This file holds all the main tests
 """
+import pytest
 
 from bodybuilder.builder import BodyBuilder as bodyBuilder
 
@@ -201,6 +202,15 @@ class TestBodyBuilder:
         }
 
         assert result.getQuery() == expected_query
+
+    def test__aggregation_few_arguments(self):
+        with pytest.raises(IndexError) as e:
+            bodyBuilder().aggregation().build()
+        assert "Too Few arguments for aggregation query" in str(e.value)
+
+        with pytest.raises(IndexError) as e:
+            bodyBuilder().aggregation("a").build()
+        assert "Too Few arguments for aggregation query" in str(e.value)
 
     def test__nested_aggregations(self):
         result = bodyBuilder() \
