@@ -51,43 +51,48 @@ class BodyBuilder:
         return query_dict
 
     @staticmethod
+    def _get_query_field_dict_aggs(args_list):
+        return {'field': args_list[1]} if type(args_list[1]) is str else {}
+
+    @staticmethod
+    def _get_aggs_options(args_list, query_field_dict):
+        additional_options = [x for x in args_list if type(x) is dict]
+        return {key: value for d in (additional_options + [query_field_dict])
+                for key, value in d.items()}
+
+    @staticmethod
+    def _get_aggs_query_name(args_list, query_field, query_type):
+        query_name_candidates = [x for x in args_list[2:] if type(x) is str]
+
+        if len(query_name_candidates) > 0:
+            query_name = query_name_candidates[0]
+        else:
+            if len(query_field) == 0:
+                raise ValueError("Query name should be provided \
+                                  if query field is empty")
+            query_name = f"agg_{query_type}_{list(query_field.values())[0]}"
+        return query_name
+
+    @staticmethod
     def create_aggs_query(*args):
 
         if len(args) <= 1:
             raise IndexError("Too Few arguments for aggregation query")
         args_list = list(args)
 
-        nested_function = None
-
-        if callable(args_list[-1]):
-            nested_function = args_list.pop()
+        nested_function = args_list.pop() if callable(args_list[-1]) else None
 
         query_type = args_list[0]
-
-        query_field_dict = {
-            'field': args_list[1]
-        } if type(args_list[1]) is str else {}
-
-        additional_options = [x for x in args_list if type(x) is dict]
-        all_options = {key: value
-                       for d in (additional_options + [query_field_dict])
-                       for key, value in d.items()}
-
-        query_name_candidates = [x for x in args_list[2:] if type(x) is str]
-
-        if len(query_name_candidates) > 0:
-            query_name = query_name_candidates[0]
-        else:
-            if len(query_field_dict) == 0:
-                raise ValueError("Query name should be provided \
-                                  if query field is empty")
-            query_name = f"agg_{query_type}_{list(query_field_dict.values())[0]}" # noqa E501
+        query_field = BodyBuilder._get_query_field_dict_aggs(args_list)
+        all_options = BodyBuilder._get_aggs_options(args_list, query_field)
+        query_name = BodyBuilder._get_aggs_query_name(args_list, query_field, query_type)  # noqa E501
 
         query_dict = {
             query_name: {
                 query_type: all_options
             }
         }
+
         if nested_function is not None:
             nested_aggs_query = nested_function(BodyBuilder()).getAggregations()  # noqa E501
             query_dict[query_name]['aggs'] = nested_aggs_query
