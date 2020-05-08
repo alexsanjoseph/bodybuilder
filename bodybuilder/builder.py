@@ -74,6 +74,14 @@ class BodyBuilder:
         return query_name
 
     @staticmethod
+    def _add_nested_function_aggs(query_dict, nested_function, query_name):
+        if nested_function is None:
+            return query_dict
+        nested_aggs_query = nested_function(BodyBuilder()).getAggregations()
+        query_dict[query_name]['aggs'] = nested_aggs_query
+        return query_dict
+
+    @staticmethod
     def create_aggs_query(*args):
 
         if len(args) <= 1:
@@ -93,9 +101,8 @@ class BodyBuilder:
             }
         }
 
-        if nested_function is not None:
-            nested_aggs_query = nested_function(BodyBuilder()).getAggregations()  # noqa E501
-            query_dict[query_name]['aggs'] = nested_aggs_query
+        query_dict = BodyBuilder._add_nested_function_aggs(
+            query_dict, nested_function, query_name)
 
         return query_dict
 
@@ -178,7 +185,7 @@ class BodyBuilder:
             + len(self.filters)
             + len(self.orFilters)
             + len(self.notFilters)
-                ) > 0:
+        ) > 0:
             return True
         return False
 
