@@ -481,3 +481,54 @@ class TestBodyBuilder:
         }
 
         assert result.getQuery() == expected_query
+
+    def test__query_filter_aggs(self):
+        result = bodyBuilder() \
+            .query('match', 'message', 'this is a test') \
+            .filter('term', 'user', 'kimchy') \
+            .filter('term', 'user', 'herald') \
+            .orFilter('term', 'user', 'johnny') \
+            .notFilter('term', 'user', 'cassie') \
+            .aggregation('terms', 'user') \
+            .build()
+
+        expected_query = {
+            "query": {
+                "bool": {
+                    "must": {
+                        "match": {
+                            "message": "this is a test"
+                        }
+                    },
+                    "filter": [{
+                        "term": {
+                            "user": "kimchy"
+                        }
+                    }, {
+                        "term": {
+                            "user": "herald"
+                        }
+                    }],
+                    "should": {
+                        "term": {
+                            "user": "johnny"
+                        }
+                    },
+                    "must_not": {
+                        "term": {
+                            "user": "cassie"
+                        }
+                    }
+                }
+            },
+            "aggs": {
+                "agg_terms_user": {
+                    "terms": {
+                        "field": "user"
+                    }
+                }
+            }
+        }
+
+        assert result == expected_query
+
