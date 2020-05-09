@@ -117,7 +117,6 @@ class TestBodyBuilder:
                 }
             }
         }
-
         assert expected_query == result
 
     def test__basic_sort(self):
@@ -349,7 +348,7 @@ class TestBodyBuilder:
             .query('nested', 'path', 'comments',
                    {
                        'score_mode': 'max'
-                    },
+                   },
                    lambda q: q
                    .query('match', 'comments.name', 'john')
                    .query('match', 'comments.age', 28)
@@ -413,26 +412,27 @@ class TestBodyBuilder:
         result = bodyBuilder() \
             .query('constant_score',
                    lambda q: q
-                        .orFilter('term', 'created_by.user_id', 'abc')
-                        .orFilter('nested', 'path', 'doc_meta',
-                                  lambda q1: q1.
-                                      query('constant_score',
-                                            lambda q2: q2
-                                                .filter('term',
-                                                        'doc_meta.user_id',
-                                                        'abc')
-                                      )
-                                  )
-                        .orFilter('nested', 'path', 'tests',
-                                 lambda q: q
-                                     .query('constant_score',
-                                            lambda q1: q1
-                                                .filter(
-                                                    'term',
-                                                    'tests.created_by.user_id',
-                                                    'abc')
-                                            )
+                   .orFilter('term', 'created_by.user_id', 'abc')
+                   .orFilter(
+                       'nested', 'path', 'doc_meta',
+                       lambda q1: q1.
+                           query('constant_score',
+                                 lambda q2: q2
+                                 .filter('term',
+                                         'doc_meta.user_id',
+                                         'abc')
                                  )
+                   )
+                   .orFilter('nested', 'path', 'tests',
+                             lambda q1: q1
+                             .query('constant_score',
+                                    lambda q2: q2
+                                    .filter(
+                                        'term',
+                                        'tests.created_by.user_id',
+                                        'abc')
+                                    )
+                             )
                    )
 
         expected_query = {
@@ -441,8 +441,8 @@ class TestBodyBuilder:
                     "bool": {
                         "should": [
                             {
-                                "term":{
-                                "created_by.user_id":"abc"
+                                "term": {
+                                    "created_by.user_id": "abc"
                                 }
                             },
                             {
@@ -452,7 +452,7 @@ class TestBodyBuilder:
                                         "constant_score": {
                                             "filter": {
                                                 "term": {
-                                                    "doc_meta.user_id":"abc"
+                                                    "doc_meta.user_id": "abc"
                                                 }
                                             }
                                         }
@@ -461,12 +461,12 @@ class TestBodyBuilder:
                             },
                             {
                                 "nested": {
-                                    "path":"tests",
+                                    "path": "tests",
                                     "query": {
                                         "constant_score": {
                                             "filter": {
                                                 "term": {
-                                                    "tests.created_by.user_id":"abc"
+                                                    "tests.created_by.user_id": "abc"  # noqa 501
                                                 }
                                             }
                                         }
