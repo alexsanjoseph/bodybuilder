@@ -91,6 +91,37 @@ class TestBodyBuilder:
 
         assert result == expected_query
 
+    def test__multiple_filters(self):
+        result = bodyBuilder() \
+            .filter('range', 'count', {'gt': 5}) \
+            .filter('term', 'a') \
+            .build()
+
+        expected_query = {
+            'query': {
+                'bool': {
+                    'filter': [
+                        {
+                            'range': {
+                                'count': {
+                                    'gt': 5
+                                }
+                            }
+                        },
+                        {
+                            'term': {
+                                'field': "a"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+        assert expected_query == result
+
+
+
     def test__basic_sort(self):
         result = bodyBuilder().sort('timestamp').build()
         expected_query = {

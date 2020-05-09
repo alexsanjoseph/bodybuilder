@@ -126,6 +126,16 @@ class BodyBuilder:
         else:
             raise NotImplementedError
 
+    def _add_bool_queries(self, type, name):
+        if len(getattr(self, type)) == 0:
+            return
+        if len(getattr(self, type)) == 1:
+            bool_dict = self.create_generic_query(*getattr(self, type)[0])
+            self.body['query']['bool'][name] = bool_dict
+        else:
+            bool_list = [self.create_generic_query(*x) for x in getattr(self, type)]
+            self.body['query']['bool'][name] = bool_list
+
     def _add_filters(self):
         if len(self.filters) == 0:
             return
@@ -133,10 +143,18 @@ class BodyBuilder:
             filter_dict = self.create_generic_query(*self.filters[0])
             self.body['query']['bool']['filter'] = filter_dict
         else:
-            raise NotImplementedError
+            filter_list = [self.create_generic_query(*x) for x in self.filters]
+            self.body['query']['bool']['filter'] = filter_list
 
     def _add_or_filters(self):
-        pass
+        if len(self.orFilters) == 0:
+            return
+        if len(self.orFilters) <= 1:
+            filter_dict = self.create_generic_query(*self.orFilters[0])
+            self.body['query']['bool']['should'] = filter_dict
+        else:
+            filter_list = [self.create_generic_query(*x) for x in self.orFilters]
+            self.body['query']['bool']['should'] = filter_list
 
     def _add_not_filters(self):
         if len(self.filters) == 0:
@@ -237,10 +255,13 @@ class BodyBuilder:
             self._add_queries_simple()
         else:
             self._add_bool_struct()
-            self._add_queries()
-            self._add_filters()
-            self._add_or_filters()
-            self._add_not_filters()
+            self._add_bool_queries('queries', 'must')
+            self._add_bool_queries('filters', 'filter')
+            self._add_bool_queries('orFilters', 'should')
+            self._add_bool_queries('notFilters', 'must_not')
+            # self._add_filters()
+            # self._add_or_filters()
+            # self._add_not_filters()
 
     def build(self):
         if self.query_exists():
