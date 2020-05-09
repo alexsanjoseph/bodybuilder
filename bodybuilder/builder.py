@@ -20,6 +20,7 @@ class BodyBuilder:
         self.misc = {}
         self.body = {}
         self.rawOptions = {}
+        self.minimumShouldMatch = {}
 
     def _add_bool_struct(self):
         self.body['query'] = {
@@ -248,6 +249,14 @@ class BodyBuilder:
 
     def rawOption(self, key, value):
         self.rawOptions[key] = value
+        return self
+
+    def queryMinimumShouldMatch(self, value):
+        self.minimumShouldMatch['query'] = value
+        return self
+
+    def filterMinimumShouldMatch(self, value):
+        self.minimumShouldMatch['filter'] = value
         return self
 
     def add_query_details(self):

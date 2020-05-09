@@ -328,9 +328,10 @@ class TestBodyBuilder:
                    },
                    lambda q: q
                    .query('match', 'obj1.name', 'blue')
-                   .query('range', 'obj1.count', {
-                       'gt': 5
-                   }
+                   .query('range', 'obj1.count',
+                          {
+                              'gt': 5
+                          }
                           )
                    )
 
@@ -585,21 +586,21 @@ class TestBodyBuilder:
 
     def test__complex_dynamic_filter(self):
         result = bodyBuilder() \
-                     .orFilter('bool',
-                               lambda f: f
-                                .filter('terms', 'tags', ['Popular'])
-                                .filter('terms', 'brands', ['A', 'B'])
-                                ) \
-                     .orFilter('bool',
-                               lambda f: f
-                               .filter('terms', 'tags', ['Emerging'])
-                               .filter('terms', 'brands', ['C'])
-                            ) \
-                     .orFilter('bool',
-                               lambda f: f
-                               .filter('terms', 'tags', ['Rumor'])
-                               .filter('terms', 'companies', ['A', 'C', 'D'])
-                               ) \
+            .orFilter('bool',
+                      lambda f: f
+                      .filter('terms', 'tags', ['Popular'])
+                      .filter('terms', 'brands', ['A', 'B'])
+                      ) \
+            .orFilter('bool',
+                      lambda f: f
+                      .filter('terms', 'tags', ['Emerging'])
+                      .filter('terms', 'brands', ['C'])
+                      ) \
+            .orFilter('bool',
+                      lambda f: f
+                      .filter('terms', 'tags', ['Rumor'])
+                      .filter('terms', 'companies', ['A', 'C', 'D'])
+                      ) \
             .build()
 
         expected_query = {
@@ -652,4 +653,31 @@ class TestBodyBuilder:
                 }
             }
         }
+        assert result == expected_query
+
+    def test__minimum_should_match(self):
+
+        result = bodyBuilder() \
+            .orFilter('term', 'user', 'kimchy') \
+            .orFilter('term', 'user', 'tony') \
+            .filterMinimumShouldMatch(2) \
+            .build()
+
+        expected_query = {
+            "query": {
+                "bool": {
+                    "should": [{
+                        "term": {
+                            "user": "kimchy"
+                        }
+                    }, {
+                        "term": {
+                            "user": "tony"
+                        }
+                    }],
+                    "minimum_should_match": 2
+                }
+            }
+        }
+
         assert result == expected_query
