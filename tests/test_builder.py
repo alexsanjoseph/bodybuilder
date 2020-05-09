@@ -346,11 +346,12 @@ class TestBodyBuilder:
     def test__chained_nested(self):
         result = bodyBuilder() \
             .query('match', 'title', 'eggs') \
-            .query('nested', 'path', 'comments', {
-            'score_mode': 'max'
-        },
-                   lambda q: q \
-                   .query('match', 'comments.name', 'john') \
+            .query('nested', 'path', 'comments',
+                   {
+                       'score_mode': 'max'
+                    },
+                   lambda q: q
+                   .query('match', 'comments.name', 'john')
                    .query('match', 'comments.age', 28)
                    )
 
