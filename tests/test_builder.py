@@ -551,3 +551,105 @@ class TestBodyBuilder:
 
         assert result == expected_query
 
+    def test__dynamic_filter(self):
+        result = bodyBuilder() \
+            .filter('constant_score',
+                    lambda f: f.filter('term', 'user', 'kimchy')) \
+            .filter('term', 'message', 'this is a test') \
+            .build()
+
+        expected_query = {
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "constant_score": {
+                                "filter": {
+                                    "term": {
+                                        "user": "kimchy"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "term": {
+                                "message": "this is a test"
+                            }
+                        }
+                    ]
+
+                }
+            }
+        }
+        assert result == expected_query
+
+    def test__complex_dynamic_filter(self):
+        result = bodyBuilder() \
+                     .orFilter('bool',
+                               lambda f: f
+                                .filter('terms', 'tags', ['Popular'])
+                                .filter('terms', 'brands', ['A', 'B'])
+                                ) \
+                     .orFilter('bool',
+                               lambda f: f
+                               .filter('terms', 'tags', ['Emerging'])
+                               .filter('terms', 'brands', ['C'])
+                            ) \
+                     .orFilter('bool',
+                               lambda f: f
+                               .filter('terms', 'tags', ['Rumor'])
+                               .filter('terms', 'companies', ['A', 'C', 'D'])
+                               ) \
+            .build()
+
+        expected_query = {
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "bool": {
+                                "filter": [{
+                                    "terms": {
+                                        "tags": ["Popular"]
+                                    }
+                                }, {
+                                    "terms": {
+                                        "brands": ["A", "B"]
+                                    }
+                                }]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "filter": [{
+                                    "terms": {
+                                        "tags": ["Emerging"]
+                                    }
+                                }, {
+                                    "terms": {
+                                        "brands": ["C"]
+                                    }
+                                }]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "filter": [
+                                    {
+                                        "terms": {
+                                            "tags": ["Rumor"]
+                                        }
+                                    },
+                                    {
+                                        "terms": {
+                                            "companies": ["A", "C", "D"]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        assert result == expected_query
