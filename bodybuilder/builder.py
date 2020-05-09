@@ -143,14 +143,14 @@ class BodyBuilder:
     def _add_queries_simple(self):
         self.body['query'] = self.create_generic_query(*self.queries[0])
 
-    def _add_bool_queries(self, type, name):
-        if len(getattr(self, type)) == 0:
+    def _add_bool_queries(self, query_type, name):
+        if len(getattr(self, query_type)) == 0:
             return
-        if len(getattr(self, type)) == 1:
-            bool_dict = self.create_generic_query(*getattr(self, type)[0])
+        if len(getattr(self, query_type)) == 1:
+            bool_dict = self.create_generic_query(*getattr(self, query_type)[0])
             self.body['query']['bool'][name] = bool_dict
         else:
-            bool_list = [self.create_generic_query(*x) for x in getattr(self, type)]
+            bool_list = [self.create_generic_query(*x) for x in getattr(self, query_type)]
             self.body['query']['bool'][name] = bool_list
 
     def _add_aggs(self):
@@ -225,10 +225,7 @@ class BodyBuilder:
         return self
 
     def getQuery(self):
-        if self.is_simple_query():
-            return self.build()['query']
-        else:
-            return self.build()['query']['bool']['must']
+        return self.build()['query']
 
     def getFilter(self):
         return self.build()['query']['bool']['filter']

@@ -63,8 +63,8 @@ class TestBodyBuilder:
             }
         }
 
-        assert result.getQuery() == expected_query
-        assert result.getFilter() == expected_filter
+        assert result.build()['query']['bool']['must'] == expected_query
+        assert result.build()['query']['bool']['filter'] == expected_filter
 
     def test__filtered_query(self):
         result = bodyBuilder() \
@@ -296,3 +296,43 @@ class TestBodyBuilder:
         }
 
         assert result.getQuery() == expected_query
+
+    def test__nest_bool_merged_queries(self):
+        result = bodyBuilder() \
+            .query('nested', 'path', 'obj1',
+                   {'score_mode': 'avg'},
+                   lambda q: q
+                        .query('match', 'obj1.name', 'blue')
+                        .query('range', 'obj1.count', {'gt': 5}
+                               )
+                   )
+
+        expected_query = {
+            'nested': {
+                'path': 'obj1',
+                'score_mode': 'avg',
+                'query': {
+                    'bool': {
+                        'must': [
+                            {
+                                'match': {'obj1.name': 'blue'}
+                            },
+                            {
+                                'range': {'obj1.count': { 'gt': 5 }}
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+
+        assert result.getQuery() == expected_query
+
+    # def test__chained_nested(self):
+    #     result = bodyBuilder()
+    #     .query('match', 'title', 'eggs')
+    #     .query('nested', 'path', 'comments', { score_mode: 'max' }, (q) => {
+    #         return q
+    #             .query('match', 'comments.name', 'john')
+    #             .query('match', 'comments.age', 28)
+    #     })
