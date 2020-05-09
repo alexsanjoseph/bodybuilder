@@ -416,12 +416,13 @@ class TestBodyBuilder:
                    .orFilter(
                        'nested', 'path', 'doc_meta',
                        lambda q1: q1.
-                           query('constant_score',
-                                 lambda q2: q2
-                                 .filter('term',
-                                         'doc_meta.user_id',
-                                         'abc')
-                                 )
+                       query(
+                            'constant_score',
+                            lambda q2: q2
+                            .filter('term',
+                                    'doc_meta.user_id',
+                                    'abc')
+                           )
                    )
                    .orFilter('nested', 'path', 'tests',
                              lambda q1: q1
