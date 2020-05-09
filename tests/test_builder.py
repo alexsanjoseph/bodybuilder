@@ -120,8 +120,6 @@ class TestBodyBuilder:
 
         assert expected_query == result
 
-
-
     def test__basic_sort(self):
         result = bodyBuilder().sort('timestamp').build()
         expected_query = {
@@ -209,7 +207,9 @@ class TestBodyBuilder:
 
         expected_query = {
             'range': {
-                'date': {'gt': 'now-1d'}
+                'date': {
+                    'gt': 'now-1d'
+                }
             }
         }
 
@@ -219,8 +219,13 @@ class TestBodyBuilder:
         result = bodyBuilder() \
             .query('geo_distance',
                    'point',
-                   {'lat': 40, 'lon': 20},
-                   {'distance': '12km'}
+                   {
+                       'lat': 40,
+                       'lon': 20
+                   },
+                   {
+                       'distance': '12km'
+                   }
                    )
         expected_query = {
             'geo_distance': {
@@ -300,11 +305,15 @@ class TestBodyBuilder:
     def test__nest_bool_merged_queries(self):
         result = bodyBuilder() \
             .query('nested', 'path', 'obj1',
-                   {'score_mode': 'avg'},
+                   {
+                       'score_mode': 'avg'
+                   },
                    lambda q: q
-                        .query('match', 'obj1.name', 'blue')
-                        .query('range', 'obj1.count', {'gt': 5}
-                               )
+                   .query('match', 'obj1.name', 'blue')
+                   .query('range', 'obj1.count', {
+                       'gt': 5
+                   }
+                          )
                    )
 
         expected_query = {
@@ -315,10 +324,16 @@ class TestBodyBuilder:
                     'bool': {
                         'must': [
                             {
-                                'match': {'obj1.name': 'blue'}
+                                'match': {
+                                    'obj1.name': 'blue'
+                                }
                             },
                             {
-                                'range': {'obj1.count': { 'gt': 5 }}
+                                'range': {
+                                    'obj1.count': {
+                                        'gt': 5
+                                    }
+                                }
                             }
                         ]
                     }
@@ -328,11 +343,49 @@ class TestBodyBuilder:
 
         assert result.getQuery() == expected_query
 
-    # def test__chained_nested(self):
-    #     result = bodyBuilder()
-    #     .query('match', 'title', 'eggs')
-    #     .query('nested', 'path', 'comments', { score_mode: 'max' }, (q) => {
-    #         return q
-    #             .query('match', 'comments.name', 'john')
-    #             .query('match', 'comments.age', 28)
-    #     })
+    def test__chained_nested(self):
+        result = bodyBuilder() \
+            .query('match', 'title', 'eggs') \
+            .query('nested', 'path', 'comments', {
+            'score_mode': 'max'
+        },
+                   lambda q: q \
+                   .query('match', 'comments.name', 'john') \
+                   .query('match', 'comments.age', 28)
+                   )
+
+        expected_query = {
+            'bool': {
+                'must': [
+                    {
+                        'match': {
+                            'title': 'eggs'
+                        }
+                    },
+                    {
+                        'nested': {
+                            'path': 'comments',
+                            'score_mode': 'max',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'comments.name': 'john'
+                                            }
+                                        },
+                                        {
+                                            'match': {
+                                                'comments.age': 28
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+
+        assert result.getQuery() == expected_query
