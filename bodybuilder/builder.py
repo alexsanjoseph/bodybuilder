@@ -27,26 +27,52 @@ class BodyBuilder:
         }
 
     @staticmethod
-    def create_generic_query(*args):
-        query_dict = {
-            args[0]: {}
+    def _add_nested_function_query(query_dict, nested_function, query_name):
+        if nested_function is None:
+            return query_dict
+        nested_query = nested_function(BodyBuilder()).getQuery()
+        query_dict[query_name]['query'] = nested_query
+        return query_dict
+
+    @staticmethod
+    def _create_empty_query_dict(query_name):
+        return {
+            query_name: {}
         }
-        if len(args) == 1:
+
+    @staticmethod
+    def _get_query_field_value(args_list):
+        if len(args_list) == 2:
+            query_field, query_val = 'field', args_list[1]
+        else:
+            query_field, query_val = args_list[1], args_list[2]
+        return query_field, query_val
+
+    @staticmethod
+    def create_generic_query(*args):
+        args_list = list(args)
+        query_name = args_list[0]
+        query_dict = BodyBuilder._create_empty_query_dict(query_name)
+
+        if len(args_list) == 1:
             return query_dict
 
-        if len(args) == 2:
-            query_field, query_val = 'field', args[1]
-        else:
-            query_field, query_val = args[1], args[2]
+        nested_function = args_list.pop() if callable(args_list[-1]) else None
+        query_field, query_val = BodyBuilder._get_query_field_value(args_list)
 
-        query_dict[args[0]] = {
+        query_dict[query_name] = {
             query_field: query_val
         }
-        if len(args) == 4:
-            for key, value in args[3].items():
-                query_dict[args[0]][key] = value
-        if len(args) > 4:
+
+        if len(args_list) == 4:
+            for key, value in args_list[3].items():
+                query_dict[args_list[0]][key] = value
+
+        if len(args_list) > 4:
             raise IndexError("Too many arguments to query!")
+
+        query_dict = BodyBuilder._add_nested_function_query(
+            query_dict, nested_function, query_name)
 
         return query_dict
 
@@ -117,15 +143,6 @@ class BodyBuilder:
     def _add_queries_simple(self):
         self.body['query'] = self.create_generic_query(*self.queries[0])
 
-    def _add_queries(self):
-        if len(self.queries) == 0:
-            return
-        if len(self.queries) <= 1:
-            filter_dict = self.create_generic_query(*self.queries[0])
-            self.body['query']['bool']['must'] = filter_dict
-        else:
-            raise NotImplementedError
-
     def _add_bool_queries(self, type, name):
         if len(getattr(self, type)) == 0:
             return
@@ -135,33 +152,6 @@ class BodyBuilder:
         else:
             bool_list = [self.create_generic_query(*x) for x in getattr(self, type)]
             self.body['query']['bool'][name] = bool_list
-
-    def _add_filters(self):
-        if len(self.filters) == 0:
-            return
-        if len(self.filters) <= 1:
-            filter_dict = self.create_generic_query(*self.filters[0])
-            self.body['query']['bool']['filter'] = filter_dict
-        else:
-            filter_list = [self.create_generic_query(*x) for x in self.filters]
-            self.body['query']['bool']['filter'] = filter_list
-
-    def _add_or_filters(self):
-        if len(self.orFilters) == 0:
-            return
-        if len(self.orFilters) <= 1:
-            filter_dict = self.create_generic_query(*self.orFilters[0])
-            self.body['query']['bool']['should'] = filter_dict
-        else:
-            filter_list = [self.create_generic_query(*x) for x in self.orFilters]
-            self.body['query']['bool']['should'] = filter_list
-
-    def _add_not_filters(self):
-        if len(self.filters) == 0:
-            return
-
-        if len(self.filters) == 1:
-            self.create_generic_query(*self.filters[0])
 
     def _add_aggs(self):
         if len(self.aggs) == 0:
@@ -259,9 +249,6 @@ class BodyBuilder:
             self._add_bool_queries('filters', 'filter')
             self._add_bool_queries('orFilters', 'should')
             self._add_bool_queries('notFilters', 'must_not')
-            # self._add_filters()
-            # self._add_or_filters()
-            # self._add_not_filters()
 
     def build(self):
         if self.query_exists():

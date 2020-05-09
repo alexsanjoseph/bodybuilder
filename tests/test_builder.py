@@ -277,3 +277,22 @@ class TestBodyBuilder:
         }
 
         assert result == expected_query
+
+    def test__nested_queries(self):
+        result = bodyBuilder() \
+            .query('nested', 'path', 'obj1',
+                   lambda q: q.query('match', 'obj1.color', 'blue')
+                   )
+
+        expected_query = {
+            'nested': {
+                'path': 'obj1',
+                'query': {
+                    'match': {
+                        'obj1.color': 'blue'
+                    }
+                }
+            }
+        }
+
+        assert result.getQuery() == expected_query
