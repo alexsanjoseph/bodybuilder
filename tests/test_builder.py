@@ -28,7 +28,7 @@ class TestBodyBuilder:
 
         assert result.getQuery() == expected_query
 
-    def test__filter_without_query(self):
+    def test__basic_filter(self):
         result = bodyBuilder() \
             .filter('term', 'user', 'kimchy') \
             .build()
@@ -41,6 +41,25 @@ class TestBodyBuilder:
                             'user': 'kimchy'
                         }
                     }
+                }
+            }
+        }
+
+        assert result == expected_query
+
+    def test__not_filter(self):
+        result = bodyBuilder() \
+            .notFilter('term', 'user', 'kimchy') \
+            .build()
+
+        expected_query = {
+            'query': {
+                'bool': {
+                    'must_not': [{
+                        'term': {
+                            'user': 'kimchy'
+                        }
+                    }]
                 }
             }
         }
@@ -509,16 +528,16 @@ class TestBodyBuilder:
                             "user": "herald"
                         }
                     }],
-                    "should": {
+                    "should": [{
                         "term": {
                             "user": "johnny"
                         }
-                    },
-                    "must_not": {
+                    }],
+                    "must_not": [{
                         "term": {
                             "user": "cassie"
                         }
-                    }
+                    }]
                 }
             },
             "aggs": {

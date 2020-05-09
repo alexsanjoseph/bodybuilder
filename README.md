@@ -1,5 +1,5 @@
 # bodybuilder
-An (almost!) drop in replacement of the Amazing Bodybuilder Package on NPM
+An (almost!) drop in replacement of the Elasticsearch Bodybuilder Package on NPM
 
 # Variations
 - `from` -> `from_` because `from` is a python keyword

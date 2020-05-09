@@ -150,7 +150,8 @@ class BodyBuilder:
     def _add_bool_queries(self, query_type, name):
         if len(getattr(self, query_type)) == 0:
             return
-        if len(getattr(self, query_type)) == 1:
+        always_array_types = ['orFilters', 'notFilters']
+        if len(getattr(self, query_type)) == 1 and query_type not in always_array_types:
             bool_dict = self.create_generic_query(*getattr(self, query_type)[0])
             self.body['query']['bool'][name] = bool_dict
         else:
