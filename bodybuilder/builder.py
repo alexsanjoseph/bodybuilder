@@ -232,16 +232,19 @@ class BodyBuilder:
         self.rawOptions[key] = value
         return self
 
+    def add_query_details(self):
+        if self.is_simple_query():
+            self._add_queries_simple()
+        else:
+            self._add_bool_struct()
+            self._add_queries()
+            self._add_filters()
+            self._add_or_filters()
+            self._add_not_filters()
+
     def build(self):
         if self.query_exists():
-            if self.is_simple_query():
-                self._add_queries_simple()
-            else:
-                self._add_bool_struct()
-                self._add_queries()
-                self._add_filters()
-                self._add_or_filters()
-                self._add_not_filters()
+            self.add_query_details()
         self._add_sorts()
         self._add_rawOptions()
         self._add_misc()
