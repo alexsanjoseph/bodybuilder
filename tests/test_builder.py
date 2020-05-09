@@ -390,3 +390,93 @@ class TestBodyBuilder:
         }
 
         assert result.getQuery() == expected_query
+
+    def test__constant_score(self):
+        result = bodyBuilder() \
+            .filter('constant_score',
+                    lambda f: f.filter('term', 'field', 'value')
+                    )
+
+        expected_query = {
+            'constant_score': {
+                'filter': {
+                    'term': {
+                        'field': 'value'
+                    }
+                }
+            }
+        }
+
+        assert result.getFilter() == expected_query
+
+    def test__bigass_query(self):
+        result = bodyBuilder() \
+            .query('constant_score',
+                   lambda q: q
+                        .orFilter('term', 'created_by.user_id', 'abc')
+                        .orFilter('nested', 'path', 'doc_meta',
+                                  lambda q1: q1.
+                                      query('constant_score',
+                                            lambda q2: q2
+                                                .filter('term',
+                                                        'doc_meta.user_id',
+                                                        'abc')
+                                      )
+                                  )
+                        .orFilter('nested', 'path', 'tests',
+                                 lambda q: q
+                                     .query('constant_score',
+                                            lambda q1: q1
+                                                .filter(
+                                                    'term',
+                                                    'tests.created_by.user_id',
+                                                    'abc')
+                                            )
+                                 )
+                   )
+
+        expected_query = {
+            "constant_score": {
+                "query": {  # originally filter?
+                    "bool": {
+                        "should": [
+                            {
+                                "term":{
+                                "created_by.user_id":"abc"
+                                }
+                            },
+                            {
+                                "nested": {
+                                    "path": "doc_meta",
+                                    "query": {
+                                        "constant_score": {
+                                            "filter": {
+                                                "term": {
+                                                    "doc_meta.user_id":"abc"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "nested": {
+                                    "path":"tests",
+                                    "query": {
+                                        "constant_score": {
+                                            "filter": {
+                                                "term": {
+                                                    "tests.created_by.user_id":"abc"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+
+        assert result.getQuery() == expected_query
