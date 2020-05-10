@@ -709,3 +709,22 @@ class TestBodyBuilder:
         }
 
         assert result.getAggregations() == expected_query
+
+    def test__percentiles_aggregation(self):
+        result = bodyBuilder() \
+            .aggregation('percentiles', 'load_time',
+                         {
+                             'percents': [1, 50, 99]
+                         })
+
+        expected_query = {
+            'agg_percentiles_load_time': {
+                'percentiles': {
+                    'field': 'load_time',
+                    'percents': [1, 50, 99]
+                }
+            }
+        }
+
+        assert result.getAggregations() == expected_query
+
