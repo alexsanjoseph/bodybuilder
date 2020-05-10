@@ -10,8 +10,8 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bodybuilder-alexsanjoseph",  # Replace with your own username
-    version="0.0.1",
-    author="Alex Josephh",
+    version="0.1.0",
+    author="Alex Joseph",
     author_email="alexsanjoseph@gmail.com",
     description="A python port of the NPM Bodybuilder Package",
     long_description=LONG_DESCRIPTION,

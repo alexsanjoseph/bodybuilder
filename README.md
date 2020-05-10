@@ -5,6 +5,25 @@ The API has been designed to be as close to the original package.
 
 Also, you can use https://bodybuilder.js.org/ to test your constructions with minor changes described below
 
+# Installation
+
+## Install from source
+
+1. Clone package locally
+2. Go to the root directory
+2. `python3 setup.py install`
+
+# Usage
+
+```python
+from bodybuilder.builder import BodyBuilder as bodyBuilder
+bodyBuilder().query("a", "b", "c").build()
+```
+
+```
+{'query': {'a': {'b': 'c'}}}
+```
+
 # Variations
 - `from` -> `from_` because `from` is a python keyword
 - need `\` new-line indicator for multi line incantations in python which is not necessary in JS

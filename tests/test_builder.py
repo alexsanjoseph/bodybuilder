@@ -602,7 +602,6 @@ class TestBodyBuilder:
                       .filter('terms', 'companies', ['A', 'C', 'D'])
                       ) \
             .build()
-
         expected_query = {
             "query": {
                 "bool": {
@@ -655,6 +654,7 @@ class TestBodyBuilder:
         }
         assert result == expected_query
 
+    @pytest.mark.skip
     def test__minimum_should_match(self):
 
         result = bodyBuilder() \
