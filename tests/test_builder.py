@@ -681,3 +681,31 @@ class TestBodyBuilder:
         }
 
         assert result == expected_query
+
+    def test__aggs_avg(self):
+        result = bodyBuilder() \
+            .aggregation('avg', 'grade')
+
+        expected_query = {
+            'agg_avg_grade': {
+                'avg': {
+                    'field': 'grade'
+                }
+            }
+        }
+
+        assert result.getAggregations() == expected_query
+
+    def test__aggs_cardinality(self):
+        result = bodyBuilder() \
+            .aggregation('cardinality', 'author')
+
+        expected_query = {
+            'agg_cardinality_author': {
+                'cardinality': {
+                    'field': 'author'
+                }
+            }
+        }
+
+        assert result.getAggregations() == expected_query
