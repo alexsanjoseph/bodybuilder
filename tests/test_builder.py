@@ -728,3 +728,30 @@ class TestBodyBuilder:
 
         assert result.getAggregations() == expected_query
 
+    def test__percentiles_scripit(self):
+        result = bodyBuilder() \
+            .aggregation('percentiles',
+                         {
+                             'script': {
+                                 'inline': "doc['load_time'].value / timeUnit",
+                                 'params': {
+                                     'timeUnit': 100
+                                 }
+                             }
+                         }, 'load_time_script') \
+            .getAggregations()
+
+        expected_query = {
+            'load_time_script': {
+                'percentiles': {
+                    'script': {
+                        'inline': "doc['load_time'].value / timeUnit",
+                        'params': {
+                            'timeUnit': 100
+                        }
+                    }
+                }
+            }
+        }
+
+        assert result == expected_query
