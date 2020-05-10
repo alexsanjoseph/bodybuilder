@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
-    name="bodybuilder-alexsanjoseph",  # Replace with your own username
+    name="bodybuilder",
     version="0.1.0",
     author="Alex Joseph",
     author_email="alexsanjoseph@gmail.com",
