@@ -3,7 +3,7 @@ This file holds all the main tests
 """
 import pytest
 
-from bodybuilder.builder import BodyBuilder as bodyBuilder
+from bodybuilder import BodyBuilder as bodyBuilder
 
 
 class TestBodyBuilder:
