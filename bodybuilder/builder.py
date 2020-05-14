@@ -63,22 +63,25 @@ class BodyBuilder:
         nested_function = args_list.pop() if callable(args_list[-1]) else None
 
         if len(args_list) > 1:
-            query_field, query_val = BodyBuilder._get_query_field_value(args_list)
-
-            query_dict[query_name] = {
-                query_field: query_val
-            }
-
-            if len(args_list) == 4:
-                for key, value in args_list[3].items():
-                    query_dict[args_list[0]][key] = value
-
-            if len(args_list) > 4:
-                raise IndexError("Too many arguments to query!")
+            query_dict = BodyBuilder.add_query_arguments(
+                args_list, query_dict, query_name)
 
         query_dict = BodyBuilder._add_nested_function_query(
             query_dict, nested_function, query_name)
 
+        return query_dict
+
+    @staticmethod
+    def add_query_arguments(args_list, query_dict, query_name):
+        query_field, query_val = BodyBuilder._get_query_field_value(args_list)
+        query_dict[query_name] = {
+            query_field: query_val
+        }
+        if len(args_list) == 4:
+            for key, value in args_list[3].items():
+                query_dict[args_list[0]][key] = value
+        if len(args_list) > 4:
+            raise IndexError("Too many arguments to query!")
         return query_dict
 
     @staticmethod

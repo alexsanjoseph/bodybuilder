@@ -1,6 +1,7 @@
 """
 This file holds all the main tests
 """
+
 import pytest
 
 from bodybuilder import BodyBuilder as bodyBuilder
@@ -27,6 +28,7 @@ class TestBodyBuilder:
         }
 
         assert result.getQuery() == expected_query
+
 
     def test__basic_filter(self):
         result = bodyBuilder() \
