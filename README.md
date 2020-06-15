@@ -1,5 +1,7 @@
 [![PyPI download total](https://img.shields.io/pypi/dm/bodybuilder)](https://pypi.org/project/bodybuilder/)
 [![License](https://img.shields.io/pypi/l/bodybuilder)](https://pypi.org/project/bodybuilder/)
+[![License](https://img.shields.io/pypi/v/builder)](https://pypi.org/project/bodybuilder/)
+
 
 # bodybuilder
 An (almost!) drop in replacement in python of the [Elasticsearch Bodybuilder Package on NPM](https://github.com/danpaz/bodybuilder)
