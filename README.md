@@ -34,7 +34,7 @@ Python3.6+
 # Usage
 
 ```python
-from bodybuilder.builder import BodyBuilder as bodyBuilder
+from bodybuilder import BodyBuilder as bodyBuilder
 bodyBuilder().query("a", "b", "c").build()
 ```
 
