@@ -1,3 +1,5 @@
+[![PyPI download total](https://img.shields.io/pypi/dt/bodybuilder.svg)](https://pypi.python.org/pypi/bodybuilder/)
+
 # bodybuilder
 An (almost!) drop in replacement in python of the [Elasticsearch Bodybuilder Package on NPM](https://github.com/danpaz/bodybuilder)
 
