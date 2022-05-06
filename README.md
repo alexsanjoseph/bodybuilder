@@ -44,6 +44,8 @@ bodyBuilder().query("a", "b", "c").build()
 {'query': {'a': {'b': 'c'}}}
 ```
 
+More examples can be found in the blog post here - https://blog.alexsanjoseph.com/posts/bodybuilder_intro/
+
 # Not Implemented
 
 ## To be implemented
